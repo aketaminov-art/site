@@ -152,6 +152,14 @@
     display: none;
   }
   .panel.active { display: block; }
+  /* затухание при переключении разделов (время .3s должно совпадать с 300 в JS) */
+  .panel { transition: opacity .3s ease, filter .3s ease, transform .3s ease; }
+  .panel.fade-out {
+    opacity: 0;
+    filter: blur(10px);
+    transform: scale(.97);
+    pointer-events: none;
+  }
   .panel h2 {
     font-size: 2rem; font-weight: 500; margin-bottom: 18px;
     text-shadow: 0 0 10px var(--accent), 0 0 28px rgba(255,0,230,.55);
@@ -653,7 +661,7 @@ const TRACKS = [
   $("cartFab").addEventListener("click", () => {
     const open = () => {
       document.querySelector('.tab[data-tab="prices"]').click();
-      setTimeout(() => document.querySelector(".cart").scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+      setTimeout(() => document.querySelector(".cart").scrollIntoView({ behavior: "smooth", block: "start" }), 450);
     };
     if ($("shop").hidden) { $("toShop").click(); setTimeout(open, 600); }
     else open();
@@ -668,9 +676,26 @@ const TRACKS = [
   const home = document.getElementById("home"), shop = document.getElementById("shop");
   const back = document.getElementById("back");
 
-  function activateTab(name) {
+  let tabTimer;
+  function activateTab(name, instant) {
+    clearTimeout(tabTimer);
     document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
-    document.querySelectorAll("#shop .panel").forEach(p => p.classList.toggle("active", p.id === name));
+    const panels = [...document.querySelectorAll("#shop .panel")];
+    const cur = panels.find(p => p.classList.contains("active"));
+
+    // без анимации: первый показ, тот же раздел
+    if (instant || !cur || cur.id === name) {
+      panels.forEach(p => { p.classList.remove("fade-out"); p.classList.toggle("active", p.id === name); });
+      return;
+    }
+
+    cur.classList.add("fade-out");                // старый раздел затухает
+    tabTimer = setTimeout(() => {
+      panels.forEach(p => { p.classList.remove("fade-out"); p.classList.toggle("active", p.id === name); });
+      const next = panels.find(p => p.id === name);
+      next.classList.add("fade-out");             // новый начинает невидимым
+      requestAnimationFrame(() => requestAnimationFrame(() => next.classList.remove("fade-out")));
+    }, 300);
   }
 
   let busy = false;
@@ -691,7 +716,7 @@ const TRACKS = [
       to.hidden = false;
       back.hidden = !isShop;
       document.body.classList.toggle("shop", isShop);
-      if (isShop) activateTab("info");           // при входе всегда открывается «Информация»
+      if (isShop) activateTab("info", true);     // при входе всегда открывается «Информация»
       window.scrollTo(0, 0);
 
       requestAnimationFrame(() => requestAnimationFrame(() => {
