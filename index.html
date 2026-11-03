@@ -26,12 +26,10 @@
   }
 
   /* ---------- фон и снег ---------- */
+  /* фон один на всех страницах (при переходе в прайс не меняется) */
   #bg {
     position: fixed; inset: 0; z-index: 0;
     background: #000 url("https://i.pinimg.com/originals/f1/eb/a0/f1eba09749f72888d17f62c3ae0c7e7e.gif") center / cover no-repeat;
-  }
-  body.shop #bg {
-    background: #000 url("https://i.pinimg.com/originals/55/92/0b/55920be45787293c20b0b8294c958452.gif") center / cover no-repeat;
   }
   #bg::after { /* затемнение, чтобы текст читался: меняй .55 */
     content: ""; position: absolute; inset: 0; background: rgba(0,0,0,.55);
@@ -54,6 +52,14 @@
     min-height: 100vh; display: flex; flex-direction: column;
     align-items: center; justify-content: center; gap: 20px;
     padding: 24px 16px;
+    transition: opacity .4s ease, filter .4s ease, transform .4s ease;
+  }
+  /* затухание при переходе между страницами (время .4s должно совпадать с 400 в JS) */
+  main.fade-out {
+    opacity: 0;
+    filter: blur(10px);
+    transform: scale(.97);
+    pointer-events: none;
   }
   @media (min-width: 1000px) {
     main { padding-left: 330px; }
@@ -643,10 +649,14 @@ const TRACKS = [
   });
 
   // значок корзины: открывает прайс на вкладке «Цены на услуги» и прокручивает к корзине
+  // (если прайс ещё закрыт, ждём окончания анимации перехода)
   $("cartFab").addEventListener("click", () => {
-    if ($("shop").hidden) $("toShop").click();
-    document.querySelector('.tab[data-tab="prices"]').click();
-    setTimeout(() => document.querySelector(".cart").scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+    const open = () => {
+      document.querySelector('.tab[data-tab="prices"]').click();
+      setTimeout(() => document.querySelector(".cart").scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+    };
+    if ($("shop").hidden) { $("toShop").click(); setTimeout(open, 600); }
+    else open();
   });
 
   render();
@@ -663,12 +673,32 @@ const TRACKS = [
     document.querySelectorAll("#shop .panel").forEach(p => p.classList.toggle("active", p.id === name));
   }
 
+  let busy = false;
   function show(view) {
+    if (busy) return;
+    busy = true;
     const isShop = view === "shop";
-    home.hidden = isShop; shop.hidden = !isShop; back.hidden = !isShop;
-    document.body.classList.toggle("shop", isShop);
-    if (isShop) activateTab("info"); // при входе всегда открывается «Информация»
-    window.scrollTo(0, 0);
+    const from = isShop ? home : shop;
+    const to = isShop ? shop : home;
+
+    from.classList.add("fade-out");              // старая страница затухает
+
+    setTimeout(() => {
+      from.hidden = true;
+      from.classList.remove("fade-out");
+
+      to.classList.add("fade-out");              // новая начинает невидимой
+      to.hidden = false;
+      back.hidden = !isShop;
+      document.body.classList.toggle("shop", isShop);
+      if (isShop) activateTab("info");           // при входе всегда открывается «Информация»
+      window.scrollTo(0, 0);
+
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        to.classList.remove("fade-out");         // и плавно проявляется
+        busy = false;
+      }));
+    }, 400);
   }
 
   document.getElementById("toShop").addEventListener("click", e => { e.preventDefault(); show("shop"); });
