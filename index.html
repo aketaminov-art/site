@@ -26,7 +26,6 @@
   }
 
   /* ---------- фон и снег ---------- */
-  /* фон один на всех страницах (при переходе в прайс не меняется) */
   #bg {
     position: fixed; inset: 0; z-index: 0;
     background: #000 url("https://i.pinimg.com/originals/f1/eb/a0/f1eba09749f72888d17f62c3ae0c7e7e.gif") center / cover no-repeat;
@@ -52,14 +51,6 @@
     min-height: 100vh; display: flex; flex-direction: column;
     align-items: center; justify-content: center; gap: 20px;
     padding: 24px 16px;
-    transition: opacity .4s ease, filter .4s ease, transform .4s ease;
-  }
-  /* затухание при переходе между страницами (время .4s должно совпадать с 400 в JS) */
-  main.fade-out {
-    opacity: 0;
-    filter: blur(10px);
-    transform: scale(.97);
-    pointer-events: none;
   }
   @media (min-width: 1000px) {
     main { padding-left: 330px; }
@@ -101,138 +92,22 @@
     width: 48px; height: 48px; fill: var(--accent); filter: drop-shadow(0 0 8px var(--accent));
   }
 
-  /* значки прайса и Discord: при наведении появляется подпись */
-  .price, .discord { position: relative; cursor: pointer; }
-  .price span {
-    text-decoration: none;
-    width: 48px; height: 48px; display: grid; place-items: center;
-    font-size: 44px; font-weight: 600; line-height: 1; color: var(--accent);
-    text-shadow: 0 0 8px var(--accent);
-  }
-  .price::before, .discord::before {
-    content: "price"; position: absolute; bottom: calc(100% + 10px); left: 50%;
+  /* значок Discord: при наведении появляется подпись */
+  .discord { position: relative; cursor: pointer; }
+  .discord::before {
+    content: "discord"; position: absolute; bottom: calc(100% + 10px); left: 50%;
     transform: translateX(-50%); white-space: nowrap;
     padding: 4px 12px; border-radius: 10px; font-size: .95rem; color: var(--accent);
     background: rgba(0,0,0,.6); text-shadow: 0 0 8px var(--accent);
     opacity: 0; pointer-events: none; transition: opacity .2s;
   }
-  .discord::before { content: "discord"; }
-  .price:hover::before, .discord:hover::before { opacity: 1; }
+  .discord:hover::before { opacity: 1; }
 
   .views {
     position: absolute; left: 20px; bottom: 16px;
     display: flex; align-items: center; gap: 8px; font-size: 1.05rem;
   }
   .views svg { width: 22px; height: 22px; fill: var(--accent); }
-
-  /* ---------- страница прайса ---------- */
-  #shop { padding-top: 90px; }
-  .back {
-    position: fixed; top: 24px; left: 24px; z-index: 5;
-    font: inherit; font-size: 1.05rem; color: var(--accent-dim); cursor: pointer;
-    padding: 10px 16px; border-radius: 14px; background: rgba(0,0,0,.12); border: 0;
-    transition: color .2s, text-shadow .2s;
-  }
-  .back:hover { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
-  .tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
-  .tab {
-    background: none; border: 0; cursor: pointer; font: inherit; font-size: 1.2rem;
-    color: var(--accent-dim); padding: 8px 4px;
-    transition: color .2s, text-shadow .2s;
-  }
-  .tab:hover { color: var(--accent); }
-  .tab.active {
-    color: var(--accent); text-shadow: 0 0 10px var(--accent), 0 0 24px rgba(255,0,230,.5);
-    border-bottom: 2px solid var(--accent);
-  }
-  .panel {
-    width: min(800px, 100%);
-    background: var(--card); border-radius: var(--radius);
-    padding: 32px 28px;
-    display: none;
-  }
-  .panel.active { display: block; }
-  /* затухание при переключении разделов (время .3s должно совпадать с 300 в JS) */
-  .panel { transition: opacity .3s ease, filter .3s ease, transform .3s ease; }
-  .panel.fade-out {
-    opacity: 0;
-    filter: blur(10px);
-    transform: scale(.97);
-    pointer-events: none;
-  }
-  .panel h2 {
-    font-size: 2rem; font-weight: 500; margin-bottom: 18px;
-    text-shadow: 0 0 10px var(--accent), 0 0 28px rgba(255,0,230,.55);
-  }
-  .panel h3 {
-    font-size: 1.4rem; font-weight: 500; margin: 26px 0 10px;
-    text-shadow: 0 0 8px var(--accent);
-  }
-  .panel p { font-size: 1.1rem; line-height: 1.6; margin-bottom: 14px; color: #f2c6ef; }
-  .panel .cost { color: var(--accent); font-weight: 500; }
-  .panel a { color: var(--accent); }
-  .goto {
-    background: none; border: 0; padding: 0; cursor: pointer; font: inherit;
-    color: var(--accent); text-decoration: underline; text-decoration-color: rgba(255,0,230,.5);
-  }
-  .goto:hover { text-shadow: 0 0 8px var(--accent); }
-  table { width: 100%; border-collapse: collapse; font-size: 1.1rem; }
-  th, td { text-align: left; padding: 14px 8px; border-bottom: 1px solid rgba(255,0,230,.25); }
-  th { color: var(--accent); font-weight: 500; text-shadow: 0 0 8px var(--accent); }
-  td { color: #f2c6ef; }
-  td.amount { color: var(--accent); text-align: right; white-space: nowrap; font-weight: 500; }
-  td.buy { text-align: right; width: 1%; white-space: nowrap; }
-  td.buy a, .buy-btn {
-    color: var(--accent); text-decoration: none; border: 1px solid var(--accent);
-    border-radius: 12px; padding: 6px 14px; text-shadow: 0 0 8px var(--accent);
-    box-shadow: 0 0 12px rgba(255,0,230,.35); transition: background .2s, color .2s;
-  }
-  td.buy a:hover, .buy-btn:hover { background: var(--accent); color: #000; text-shadow: none; }
-  .bundle { margin-top: 26px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
-  .bundle p { margin: 0; }
-  .buy-btn { font-size: 1.2rem; padding: 12px 26px; }
-  .count { display: inline-block; margin-left: 10px; font-size: .9rem; color: var(--accent-dim); white-space: nowrap; }
-
-  /* кнопка «+» и корзина */
-  button.add {
-    background: none; border: 1px solid var(--accent); color: var(--accent);
-    width: 32px; height: 32px; border-radius: 50%; margin-right: 10px;
-    font: inherit; font-size: 1.2rem; line-height: 1; cursor: pointer;
-    text-shadow: 0 0 8px var(--accent); box-shadow: 0 0 10px rgba(255,0,230,.35);
-    transition: background .2s, color .2s;
-  }
-  button.add:hover { background: var(--accent); color: #000; text-shadow: none; }
-  .cart { margin-top: 30px; }
-  .cart h3 { margin-top: 0; }
-  .cart-empty { color: #f2c6ef; opacity: .8; padding: 8px 0; }
-  .cart-item {
-    display: flex; align-items: center; gap: 10px; padding: 12px 0;
-    border-bottom: 1px solid rgba(255,0,230,.25); color: #f2c6ef;
-  }
-  .cart-item .nm { flex: 1; min-width: 0; }
-  .cart-item .qty { display: flex; align-items: center; gap: 8px; }
-  .cart-item .qty button, .cart-item .rm {
-    background: none; border: 1px solid rgba(255,0,230,.5); color: var(--accent);
-    width: 28px; height: 28px; border-radius: 8px; cursor: pointer; font: inherit; line-height: 1;
-  }
-  .cart-item .qty button:hover, .cart-item .rm:hover { background: var(--accent); color: #000; }
-  .cart-item .pr { color: var(--accent); white-space: nowrap; min-width: 56px; text-align: right; }
-  .cart-foot { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 16px; flex-wrap: wrap; }
-  #cartTotal { font-size: 1.25rem; color: var(--accent); text-shadow: 0 0 8px var(--accent); }
-  #cartPay:disabled { opacity: .4; cursor: default; }
-  #cartPay:disabled:hover { background: none; color: var(--accent); }
-
-  /* всплывающая подсказка после нажатия «Купить» */
-  #toast {
-    position: fixed; left: 50%; bottom: 28px; z-index: 20;
-    transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
-    max-width: calc(100% - 32px); padding: 14px 22px; border-radius: 16px;
-    background: rgba(0,0,0,.85); border: 1px solid var(--accent);
-    color: var(--accent); text-shadow: 0 0 8px var(--accent); font-size: 1.05rem; text-align: center;
-    box-shadow: 0 0 22px rgba(255,0,230,.4);
-    transition: opacity .3s, transform .3s;
-  }
-  #toast.show { opacity: 1; transform: translate(-50%, 0); }
 
   /* ---------- боковая панель: список треков + проигрыватель ---------- */
   #side {
@@ -274,35 +149,13 @@
   }
   #mute svg { width: 36px; height: 36px; fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-  /* ---------- значок корзины в углу ---------- */
-  .cart-fab {
-    position: fixed; right: 24px; bottom: 24px; z-index: 5;
-    width: 64px; height: 64px; border-radius: 50%; cursor: pointer;
-    border: 1px solid var(--accent); background: rgba(0,0,0,.45);
-    display: grid; place-items: center;
-    box-shadow: 0 0 16px rgba(255,0,230,.4); transition: transform .2s;
-  }
-  .cart-fab:hover { transform: scale(1.08); }
-  .cart-fab svg { width: 30px; height: 30px; fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .cart-fab .badge {
-    position: absolute; top: -4px; right: -4px; min-width: 24px; height: 24px; padding: 0 6px;
-    border-radius: 12px; background: var(--accent); color: #000;
-    font-size: .85rem; font-weight: 600; display: grid; place-items: center;
-  }
-
   /* ---------- телефон: всё в один столбик ---------- */
   @media (max-width: 999px) {
     #side { position: static; width: 100%; max-width: 800px; margin: 0 auto 40px; padding: 0 16px; }
     main { padding-top: 60px; }
-    #shop { padding-top: 90px; }
     #mute { top: 14px; right: 14px; width: 52px; height: 52px; }
     #mute svg { width: 26px; height: 26px; }
     .name { font-size: 2.2rem; }
-    .panel { padding: 22px 16px; }
-    .panel h2 { font-size: 1.6rem; }
-    .panel h3 { font-size: 1.2rem; }
-    .tab { font-size: 1.05rem; }
-    th, td { padding: 10px 4px; font-size: 1rem; }
   }
 </style>
 </head>
@@ -316,14 +169,7 @@
   <svg viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path id="wave1" d="M15.5 8.5a5 5 0 0 1 0 7"/><path id="wave2" d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
 </button>
 
-<button id="cartFab" class="cart-fab" type="button" aria-label="Корзина">
-  <svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 10.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="10" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg>
-  <span id="cartBadge" class="badge" hidden>0</span>
-</button>
-
-<button id="back" class="back" hidden>← назад</button>
-
-<!-- ===== ГЛАВНАЯ: ПРОФИЛЬ ===== -->
+<!-- ===== ПРОФИЛЬ ===== -->
 <main id="home">
   <section class="card" id="card">
     <img class="avatar" src="https://i.pinimg.com/originals/56/00/5a/56005a1acfe12d3df3e97c646d81b561.gif" alt="" referrerpolicy="no-referrer" onerror="this.removeAttribute('src')">
@@ -335,7 +181,6 @@
     </div>
 
     <div class="links">
-      <a class="price" href="#shop" id="toShop" aria-label="Price"><span>$</span></a>
       <a class="tg" href="https://t.me/aketaminov" target="_blank" rel="noopener" aria-label="Telegram">
         <svg viewBox="0 0 24 24"><path d="M21.7 3.3 2.6 10.7c-1.3.5-1.3 1.3-.2 1.6l4.9 1.5 1.9 5.8c.2.6.1.8.7.8.5 0 .7-.2 1-.5l2.4-2.3 4.9 3.6c.9.5 1.5.2 1.7-.8l3.2-15.2c.3-1.3-.5-1.9-1.4-1.5zM8.5 13.2l9.8-6.2c.5-.3.9-.1.5.2l-8.1 7.3-.3 3.4-1.9-4.7z"/></svg>
       </a>
@@ -351,93 +196,7 @@
   </section>
 </main>
 
-<!-- ===== ПРАЙС (внутри этой же страницы, поэтому музыка не прерывается) ===== -->
-<main id="shop" hidden>
-  <nav class="tabs">
-    <button class="tab" data-tab="learn">Услуги</button>
-    <button class="tab active" data-tab="info">Информация</button>
-    <button class="tab" data-tab="prices">Цены на услуги</button>
-  </nav>
-
-  <!-- ===== ИНФОРМАЦИЯ (открывается первой) ===== -->
-  <section class="panel active" id="info">
-    <h2>Информация</h2>
-    <p>На этом сайте вы можете приобрести несколько видов услуг в разделе <button class="goto" data-goto="prices">«Цены на услуги»</button>.</p>
-    <p>График работы: пн–сб, с 10:00 до 00:00.</p>
-    <h3>Контакты</h3>
-    <p>Telegram: <a href="https://t.me/aketaminov" target="_blank" rel="noopener">@aketaminov</a></p>
-    <p>Discord: <a href="https://discord.com/users/1433753911600218134" target="_blank" rel="noopener">aketaminov</a></p>
-  </section>
-
-  <!-- ===== ОБУЧЕНИЕ ===== -->
-  <section class="panel" id="learn">
-    <h2>Обучение</h2>
-    <p>Обучение состоит из нескольких направлений. Каждое можно пройти отдельно, в зависимости от того, что вам нужно.</p>
-
-    <h3>1. Обучение скаутингу (рекрутингу)</h3>
-    <p>После курса вы сможете охватывать гораздо больше трафика. Покажу, где и как искать нужную аудиторию, откуда её проще всего привлечь и на какие источники стоит тратить время.</p>
-    <p class="cost">Стоимость: 10$</p>
-
-    <h3>2. Анонимизация</h3>
-    <p>Помогу защитить ваши персональные данные и разберу, как сделать это правильно и без лишних ошибок. Также подскажу, какие инструменты и боты используются для этого.</p>
-    <p class="cost">Стоимость: 25$</p>
-
-    <h3>3. Курс поиску людей по открытым источникам</h3>
-    <p>Базовые навыки поиска информации по открытым источникам: где искать, как проверять найденные данные и как не упускать важное.</p>
-    <p class="cost">Стоимость: 40$</p>
-
-    <h3>4. Курс для тимлида</h3>
-    <p>Как выстроить хороший контакт с подчинёнными, вести дело так, чтобы команда работала слаженно, и как вывести свою команду на максимальный заработок.</p>
-    <p class="cost">Стоимость: 10$</p>
-  </section>
-
-  <!-- ===== ЦЕНЫ ===== -->
-  <section class="panel" id="prices">
-    <h2>Цены на услуги</h2>
-    <table>
-      <thead>
-        <tr><th>Услуга</th><th style="text-align:right">Цена</th><th></th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Обучение скаутингу (рекрутингу)</td><td class="amount">10$</td>
-          <td class="buy"><button class="add" data-add="scout" aria-label="Добавить в корзину">+</button><a href="https://t.me/aketaminov" target="_blank" rel="noopener" data-key="scout" data-base="419" data-msg="Привет! Хотел бы приобрести обучение скаутингу (рекрутингу) из твоих услуг. Мог бы рассказать подробнее?">Купить</a><span class="count" data-count="scout"></span></td>
-        </tr>
-        <tr>
-          <td>Анонимизация</td><td class="amount">25$</td>
-          <td class="buy"><button class="add" data-add="anon" aria-label="Добавить в корзину">+</button><a href="https://t.me/aketaminov" target="_blank" rel="noopener" data-key="anon" data-base="697" data-msg="Привет! Хотел бы приобрести анонимизацию из твоих услуг. Мог бы рассказать подробнее?">Купить</a><span class="count" data-count="anon"></span></td>
-        </tr>
-        <tr>
-          <td>Курс поиску людей по открытым источникам</td><td class="amount">40$</td>
-          <td class="buy"><button class="add" data-add="search" aria-label="Добавить в корзину">+</button><a href="https://t.me/aketaminov" target="_blank" rel="noopener" data-key="search" data-base="354" data-msg="Привет! Хотел бы приобрести курс по поиску людей по открытым источникам из твоих услуг. Мог бы рассказать подробнее?">Купить</a><span class="count" data-count="search"></span></td>
-        </tr>
-        <tr>
-          <td>Курс для тимлида</td><td class="amount">10$</td>
-          <td class="buy"><button class="add" data-add="lead" aria-label="Добавить в корзину">+</button><a href="https://t.me/aketaminov" target="_blank" rel="noopener" data-key="lead" data-base="178" data-msg="Привет! Хотел бы приобрести курс для тимлида из твоих услуг. Мог бы рассказать подробнее?">Купить</a><span class="count" data-count="lead"></span></td>
-        </tr>
-        <tr>
-          <td>Создание сайта-визитки / резюме</td><td class="amount">55$</td>
-          <td class="buy"><button class="add" data-add="site" aria-label="Добавить в корзину">+</button><a href="https://t.me/aketaminov" target="_blank" rel="noopener" data-key="site" data-base="819" data-msg="Привет! Хотел бы заказать создание сайта-визитки / резюме из твоих услуг. Мог бы рассказать подробнее?">Купить</a><span class="count" data-count="site"></span></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <section class="cart" aria-label="Корзина">
-      <h3>Корзина</h3>
-      <div id="cartList"></div>
-      <div class="cart-foot">
-        <span id="cartTotal"></span>
-        <button id="cartPay" class="buy-btn" type="button">Оплатить корзину</button>
-      </div>
-    </section>
-
-    <p style="margin-top:18px">Оплата и подробности: пишите в Telegram <a href="https://t.me/aketaminov" target="_blank" rel="noopener">@aketaminov</a></p>
-  </section>
-</main>
-
-<div id="toast" role="status"></div>
-
-<!-- ===== СЛЕВА: список треков и проигрыватель (виден на обеих страницах) ===== -->
+<!-- ===== СЛЕВА: список треков и проигрыватель ===== -->
 <aside id="side">
   <div class="list" id="list"></div>
 
@@ -460,7 +219,6 @@
 <script>
 /* ============ НАСТРОЙКИ ============ */
 // Файлы track1.mp3, track2.mp3, track3.mp3 лежат рядом с index.html.
-// Название можно поменять прямо здесь.
 const TRACKS = [
   { title: "kageyoshi",                          src: "track1.mp3" },
   { title: "isntgood — Highway",                 src: "track2.mp3" },
@@ -513,230 +271,6 @@ const TRACKS = [
   // формат как в Telegram: 15701 -> "15.7K"
   const short = v => v >= 1000 ? (v / 1000).toFixed(1).replace(/\.0$/, "") + "K" : String(v);
   document.getElementById("viewCount").textContent = short(n);
-})();
-
-/* ============ КНОПКИ «КУПИТЬ»: готовый текст для Telegram ============ */
-(() => {
-  const toast = document.getElementById("toast");
-  let timer;
-  function showToast(text) {
-    toast.textContent = text;
-    toast.classList.add("show");
-    clearTimeout(timer);
-    timer = setTimeout(() => toast.classList.remove("show"), 4000);
-  }
-  // счётчик нажатий «Купить»: стартовое число + нажатия в этом браузере
-  const getLocal = k => { try { return +localStorage.getItem("buy_" + k) || 0; } catch { return 0; } };
-  const setLocal = (k, v) => { try { localStorage.setItem("buy_" + k, v); } catch {} };
-  const refreshCount = k => {
-    const base = +document.querySelector(`a[data-key="${k}"]`).dataset.base;
-    document.querySelector(`[data-count="${k}"]`).textContent = "нажали: " + (base + getLocal(k));
-  };
-  document.querySelectorAll("a[data-key]").forEach(a => refreshCount(a.dataset.key));
-
-  document.querySelectorAll("a[data-msg]").forEach(a => {
-    a.addEventListener("click", () => {
-      const msg = a.dataset.msg;
-      if (a.dataset.key) {
-        setLocal(a.dataset.key, getLocal(a.dataset.key) + 1);
-        refreshCount(a.dataset.key);
-      }
-      // Telegram не всегда подставляет текст из ссылки, поэтому текст копируется в буфер
-      const copied = () => showToast("Текст скопирован. Откройте Telegram и вставьте его в сообщение.");
-      try { navigator.clipboard.writeText(msg).then(copied, copied); } catch { copied(); }
-      // ссылка открывает личные сообщения с текстом в параметре
-      a.href = "https://t.me/aketaminov?text=" + encodeURIComponent(msg);
-    });
-  });
-})();
-
-/* ============ КОРЗИНА ============ */
-/* Корзина хранится в браузере посетителя. Оплата: текст корзины уходит в Telegram. */
-(() => {
-  const CATALOG = {
-    scout:  { name: "Обучение скаутингу (рекрутингу)",          price: 10 },
-    anon:   { name: "Анонимизация",                             price: 25 },
-    search: { name: "Курс поиску людей по открытым источникам", price: 40 },
-    lead:   { name: "Курс для тимлида",                         price: 10 },
-    site:   { name: "Создание сайта-визитки / резюме",          price: 55 },
-  };
-  const KEY = "cart";
-  const $ = id => document.getElementById(id);
-  const toast = $("toast");
-  let timer;
-  function say(text) {
-    toast.textContent = text;
-    toast.classList.add("show");
-    clearTimeout(timer);
-    timer = setTimeout(() => toast.classList.remove("show"), 4000);
-  }
-
-  let cart = {};
-  try { cart = JSON.parse(localStorage.getItem(KEY)) || {}; } catch { cart = {}; }
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(cart)); } catch {} };
-  const items = () => Object.keys(cart).filter(id => cart[id] > 0 && CATALOG[id]);
-
-  function change(id, delta) {
-    cart[id] = (cart[id] || 0) + delta;
-    if (cart[id] <= 0) delete cart[id];
-    save();
-    render();
-  }
-
-  function el(tag, cls, text) {
-    const e = document.createElement(tag);
-    if (cls) e.className = cls;
-    if (text !== undefined) e.textContent = text;
-    return e;
-  }
-
-  function render() {
-    const list = $("cartList");
-    list.textContent = "";
-    const ids = items();
-    let total = 0;
-
-    if (!ids.length) {
-      list.appendChild(el("p", "cart-empty", "Корзина пуста. Нажмите «+» у нужной услуги."));
-    }
-    ids.forEach(id => {
-      const it = CATALOG[id], q = cart[id];
-      total += it.price * q;
-
-      const row = el("div", "cart-item");
-      row.appendChild(el("span", "nm", it.name));
-
-      const qty = el("div", "qty");
-      const minus = el("button", "", "−"); minus.type = "button"; minus.setAttribute("aria-label", "Меньше");
-      minus.onclick = () => change(id, -1);
-      const plus = el("button", "", "+"); plus.type = "button"; plus.setAttribute("aria-label", "Больше");
-      plus.onclick = () => change(id, 1);
-      qty.append(minus, el("span", "", String(q)), plus);
-      row.appendChild(qty);
-
-      row.appendChild(el("span", "pr", (it.price * q) + "$"));
-
-      const rm = el("button", "rm", "×"); rm.type = "button"; rm.setAttribute("aria-label", "Убрать");
-      rm.onclick = () => { delete cart[id]; save(); render(); };
-      row.appendChild(rm);
-
-      list.appendChild(row);
-    });
-
-    $("cartTotal").textContent = "Итого: " + total + "$";
-    $("cartPay").disabled = !ids.length;
-
-    const count = ids.reduce((s, id) => s + cart[id], 0);
-    $("cartBadge").textContent = count;
-    $("cartBadge").hidden = !count;
-  }
-
-  // кнопки «+» у каждой услуги
-  document.querySelectorAll("button.add").forEach(b => {
-    b.addEventListener("click", () => {
-      change(b.dataset.add, 1);
-      say("Добавлено в корзину: " + CATALOG[b.dataset.add].name);
-    });
-  });
-
-  // оплата: текст корзины уходит в личные сообщения Telegram
-  $("cartPay").addEventListener("click", () => {
-    const ids = items();
-    if (!ids.length) return;
-    let total = 0;
-    const lines = ids.map((id, i) => {
-      const it = CATALOG[id], q = cart[id], sum = it.price * q;
-      total += sum;
-      return `${i + 1}. ${it.name} — ${it.price}$ × ${q} = ${sum}$`;
-    });
-    const msg = "Привет! Хочу оплатить корзину:\n" + lines.join("\n") + "\nИтого: " + total + "$";
-
-    const copied = () => say("Содержимое корзины скопировано. Откройте Telegram и вставьте его в сообщение.");
-    try { navigator.clipboard.writeText(msg).then(copied, copied); } catch { copied(); }
-    window.open("https://t.me/aketaminov?text=" + encodeURIComponent(msg), "_blank", "noopener");
-  });
-
-  // значок корзины: открывает прайс на вкладке «Цены на услуги» и прокручивает к корзине
-  // (если прайс ещё закрыт, ждём окончания анимации перехода)
-  $("cartFab").addEventListener("click", () => {
-    const open = () => {
-      document.querySelector('.tab[data-tab="prices"]').click();
-      setTimeout(() => document.querySelector(".cart").scrollIntoView({ behavior: "smooth", block: "start" }), 450);
-    };
-    if ($("shop").hidden) { $("toShop").click(); setTimeout(open, 600); }
-    else open();
-  });
-
-  render();
-})();
-
-/* ============ ПЕРЕКЛЮЧЕНИЕ: ГЛАВНАЯ / ПРАЙС ============ */
-/* Страницы не перезагружаются, поэтому трек продолжает играть. */
-(() => {
-  const home = document.getElementById("home"), shop = document.getElementById("shop");
-  const back = document.getElementById("back");
-
-  let tabTimer;
-  function activateTab(name, instant) {
-    clearTimeout(tabTimer);
-    document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
-    const panels = [...document.querySelectorAll("#shop .panel")];
-    const cur = panels.find(p => p.classList.contains("active"));
-
-    // без анимации: первый показ, тот же раздел
-    if (instant || !cur || cur.id === name) {
-      panels.forEach(p => { p.classList.remove("fade-out"); p.classList.toggle("active", p.id === name); });
-      return;
-    }
-
-    cur.classList.add("fade-out");                // старый раздел затухает
-    tabTimer = setTimeout(() => {
-      panels.forEach(p => { p.classList.remove("fade-out"); p.classList.toggle("active", p.id === name); });
-      const next = panels.find(p => p.id === name);
-      next.classList.add("fade-out");             // новый начинает невидимым
-      requestAnimationFrame(() => requestAnimationFrame(() => next.classList.remove("fade-out")));
-    }, 300);
-  }
-
-  let busy = false;
-  function show(view) {
-    if (busy) return;
-    busy = true;
-    const isShop = view === "shop";
-    const from = isShop ? home : shop;
-    const to = isShop ? shop : home;
-
-    from.classList.add("fade-out");              // старая страница затухает
-
-    setTimeout(() => {
-      from.hidden = true;
-      from.classList.remove("fade-out");
-
-      to.classList.add("fade-out");              // новая начинает невидимой
-      to.hidden = false;
-      back.hidden = !isShop;
-      document.body.classList.toggle("shop", isShop);
-      if (isShop) activateTab("info", true);     // при входе всегда открывается «Информация»
-      window.scrollTo(0, 0);
-
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        to.classList.remove("fade-out");         // и плавно проявляется
-        busy = false;
-      }));
-    }, 400);
-  }
-
-  document.getElementById("toShop").addEventListener("click", e => { e.preventDefault(); show("shop"); });
-  back.addEventListener("click", () => show("home"));
-
-  // вкладки прайса
-  document.querySelectorAll(".tab").forEach(btn => {
-    btn.addEventListener("click", () => activateTab(btn.dataset.tab));
-  });
-  // ссылки внутри текста, которые открывают другую вкладку
-  document.querySelectorAll(".goto").forEach(btn => {
-    btn.addEventListener("click", () => activateTab(btn.dataset.goto));
-  });
 })();
 
 /* ============ ПЛЕЕР ============ */
